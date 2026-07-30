@@ -36,14 +36,11 @@ public class Tarefa {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-
-
     @CreatedDate
     @Column(nullable = false , updatable = false)
     private LocalDateTime dataInicio;
 
-
+    @Column(nullable = false)
     private LocalDateTime dataFim;
-
 
 }

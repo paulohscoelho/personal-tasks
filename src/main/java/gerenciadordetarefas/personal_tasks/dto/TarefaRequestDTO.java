@@ -1,4 +1,4 @@
-package gerenciadordetarefas.personal_tasks.DTO;
+package gerenciadordetarefas.personal_tasks.dto;
 
 import gerenciadordetarefas.personal_tasks.model.Status;
 

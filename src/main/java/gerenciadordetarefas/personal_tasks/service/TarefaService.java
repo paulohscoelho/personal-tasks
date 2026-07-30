@@ -1,7 +1,7 @@
 package gerenciadordetarefas.personal_tasks.service;
 
-import gerenciadordetarefas.personal_tasks.DTO.TarefaRequestDTO;
-import gerenciadordetarefas.personal_tasks.DTO.TarefaResponseDTO;
+import gerenciadordetarefas.personal_tasks.dto.TarefaRequestDTO;
+import gerenciadordetarefas.personal_tasks.dto.TarefaResponseDTO;
 import gerenciadordetarefas.personal_tasks.mapper.TarefaMapper;
 import gerenciadordetarefas.personal_tasks.model.Tarefa;
 import gerenciadordetarefas.personal_tasks.repository.TarefaRepository;
@@ -24,12 +24,11 @@ public class TarefaService {
                 repository.save(
                         mapper.paraTarefa(request)));
     }
-    
 
-    public List<Tarefa> ChamarTodos(){
-        List <Tarefa> listar = repository.findAll();
-        return listar;
+    public List<TarefaResponseDTO>  chamarTodos(){
+        return mapper.paraResponseDTOList(repository.findAll());
     }
+
 
     public void remover(Long id){
         Tarefa idEncontrado = repository.findById(id)

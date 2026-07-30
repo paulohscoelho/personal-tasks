@@ -10,4 +10,7 @@ public record TarefaRequestDTO(
         Status status,
         LocalDateTime dataFim
 ) {
+    public TarefaRequestDTO{
+        status = (status == null) ? Status.PENDENTE : status;
+    }
 }

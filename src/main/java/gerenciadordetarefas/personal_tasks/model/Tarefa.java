@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "personal-tasks")
+@EntityListeners(AuditingEntityListener.class)
 public class Tarefa {
 
     @Id
@@ -30,11 +32,14 @@ public class Tarefa {
     @Column(nullable = false)
     private String descricao;
 
-    @Column(nullable = false)
+    @Column
     @Enumerated(EnumType.STRING)
-    private Status status = Status.PENDENTE;
+    private Status status;
+
+
 
     @CreatedDate
+    @Column(nullable = false , updatable = false)
     private LocalDateTime dataInicio;
 
 

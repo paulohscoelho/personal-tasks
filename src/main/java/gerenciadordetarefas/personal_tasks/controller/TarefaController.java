@@ -1,9 +1,14 @@
 package gerenciadordetarefas.personal_tasks.controller;
 
 
+import gerenciadordetarefas.personal_tasks.DTO.TarefaRequestDTO;
+import gerenciadordetarefas.personal_tasks.DTO.TarefaResponseDTO;
 import gerenciadordetarefas.personal_tasks.model.Tarefa;
 import gerenciadordetarefas.personal_tasks.service.TarefaService;
 
+
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,10 +25,16 @@ public class TarefaController {
     }
 
     @PostMapping
-    public ResponseEntity<Tarefa> saveTask(@RequestBody Tarefa tarefa){
-        Tarefa salvandoTask  =  tarefaService.salvar(tarefa);
-        return ResponseEntity.ok(salvandoTask);
+    public ResponseEntity<TarefaResponseDTO> saveTask(@RequestBody TarefaRequestDTO request){
+        TarefaResponseDTO resopnse = tarefaService.salvarTarefa(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(resopnse);
     }
+
+//    @PostMapping
+//    public ResponseEntity<Tarefa> saveTask(@RequestBody Tarefa tarefa){
+//        Tarefa salvandoTask  =  tarefaService.salvar(tarefa);
+//        return ResponseEntity.ok(salvandoTask);
+//    }
 
 
     @GetMapping

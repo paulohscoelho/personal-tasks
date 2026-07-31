@@ -30,28 +30,30 @@ public class TarefaService {
     }
 
 
+    
     public void remover(Long id){
         Tarefa idEncontrado = repository.findById(id)
                 .orElseThrow( ()->new RuntimeException("id nao encontrado") );
-
         repository.delete(idEncontrado);
     }
 
 
-    public Tarefa atualizarPorId(Long id, Tarefa taskAntiga){
+    public TarefaResponseDTO atualizarPorId(Long id, TarefaRequestDTO taskAntiga){
         Tarefa taskAtualizada = repository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Id nao encontrado"));
-        taskAtualizada.setTitulo(taskAntiga.getTitulo());
-        taskAtualizada.setDescricao(taskAntiga.getDescricao());
-        taskAtualizada.setDataFim(taskAntiga.getDataFim());
-
-        return repository.save(taskAtualizada);
+                .orElseThrow(()-> new RuntimeException("id nao encontrado"));
+        taskAtualizada.setTitulo(taskAntiga.titulo());
+        taskAtualizada.setDescricao(taskAntiga.descricao());
+        taskAtualizada.setStatus(taskAntiga.status());
+        taskAtualizada.setDataFim(taskAntiga.dataFim());
+        return mapper.paraResponseDTO( repository.save(taskAtualizada));
     }
 
-    public Tarefa chamarPorId(Long id){
-        Tarefa idEncontrado = repository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Id nao encontrado"));
-        return idEncontrado;
+
+    public TarefaResponseDTO chamarPorId(Long id){
+        Tarefa tarefa = repository.findById(id)
+                .orElseThrow(()-> new RuntimeException("id não encontrado"));
+        return mapper.paraResponseDTO(tarefa);
     }
+
 
 }

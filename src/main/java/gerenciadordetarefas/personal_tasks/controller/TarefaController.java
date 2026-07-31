@@ -19,9 +19,8 @@ import java.util.List;
 @RequestMapping("/tasks")
 @RequiredArgsConstructor
 public class TarefaController {
-/// http://localhost:8080/swagger-ui/index.html
-    private final TarefaService tarefaService;
 
+    private final TarefaService tarefaService;
 
     @PostMapping
     public ResponseEntity<TarefaResponseDTO> saveTask(@RequestBody TarefaRequestDTO request){
@@ -41,13 +40,13 @@ public class TarefaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Tarefa> updateTask(@PathVariable Long id, @RequestBody Tarefa tarefa){
-        Tarefa atualizandoTask = tarefaService.atualizarPorId(id, tarefa);
-        return ResponseEntity.ok(atualizandoTask);
+    public ResponseEntity<TarefaResponseDTO> updateTask(@PathVariable Long id, @RequestBody TarefaRequestDTO request){
+        TarefaResponseDTO atualizandoTask = tarefaService.atualizarPorId(id,request);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Tarefa> getTask(@PathVariable Long id){
+    public ResponseEntity<TarefaResponseDTO> getTask(@PathVariable Long id){
         return ResponseEntity.ok(tarefaService.chamarPorId(id));
     }
 

@@ -4,7 +4,6 @@ import gerenciadordetarefas.personal_tasks.dto.TarefaRequestDTO;
 import gerenciadordetarefas.personal_tasks.dto.TarefaResponseDTO;
 import gerenciadordetarefas.personal_tasks.model.Tarefa;
 import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -33,7 +32,6 @@ public class TarefaMapper {
 
     public List<TarefaResponseDTO> paraResponseDTOList(List<Tarefa> tarefas){
         if (tarefas == null) return Collections.emptyList();
-
         return tarefas.stream().map(this::paraResponseDTO).toList();
     }
 }

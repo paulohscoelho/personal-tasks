@@ -2,7 +2,9 @@ package gerenciadordetarefas.personal_tasks.service;
 
 import gerenciadordetarefas.personal_tasks.dto.TarefaRequestDTO;
 import gerenciadordetarefas.personal_tasks.dto.TarefaResponseDTO;
+import gerenciadordetarefas.personal_tasks.exception.RegraNegocioException;
 import gerenciadordetarefas.personal_tasks.mapper.TarefaMapper;
+import gerenciadordetarefas.personal_tasks.model.Status;
 import gerenciadordetarefas.personal_tasks.model.Tarefa;
 import gerenciadordetarefas.personal_tasks.repository.TarefaRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +22,19 @@ public class TarefaService {
     private final TarefaMapper mapper;
 
     public TarefaResponseDTO salvarTarefa(TarefaRequestDTO request){
-        return mapper.paraResponseDTO(
-                repository.save(
-                        mapper.paraTarefa(request)));
+
+        Tarefa tarefa = mapper.paraTarefa(request);
+
+        if(tarefa.getDataFim().isBefore(tarefa.getDataInicio())){
+            throw  new RegraNegocioException(
+                    "A data de término da tarefa não pode ser anterior a data do inicio da tarefa");
+        }
+        if (tarefa.getStatus() == Status.CONCLUIDA){
+            throw new RegraNegocioException("A tarefa não pode ser criada como 'CONCLUIDA'");
+        }
+
+        Tarefa tarefaSalva = repository.save(tarefa);
+        return mapper.paraResponseDTO(tarefaSalva);
     }
 
     public List<TarefaResponseDTO>  chamarTodos(){

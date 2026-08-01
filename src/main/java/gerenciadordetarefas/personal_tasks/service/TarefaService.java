@@ -41,9 +41,11 @@ public class TarefaService {
 
     public void remover(Long id){
         Tarefa idEncontrado = repository.findById(id)
-                .orElseThrow( ()-> new RegraNegocioException("id "+id+" não encontrado") );
+                .orElseThrow( ()-> new RegraNegocioException("id '"+id+"' não encontrado") );
         repository.delete(idEncontrado);
     }
+
+
 
     /// CONTINUAR NA REGRA DE NEGOCIO DO  METODO ATUALIZAR
     public TarefaResponseDTO atualizarPorId(Long id, TarefaRequestDTO taskAntiga){

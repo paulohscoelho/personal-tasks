@@ -3,8 +3,10 @@ package gerenciadordetarefas.personal_tasks.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 
@@ -16,18 +18,29 @@ public class RestExceptionHandler {
 
        ErroRespostaDTO erro =  new ErroRespostaDTO(
                LocalDateTime.now(),
-               400,
+               HttpStatus.BAD_REQUEST.value(),
                "BAD_REQUEST",
                "um ou mais campos estão invalidos ou fora do padrão esperado."
        );
        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErroRespostaDTO> tratarErroTipoParametroInvalido(MethodArgumentTypeMismatchException exception){
+        ErroRespostaDTO erro = new ErroRespostaDTO(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "BAD_REQUEST",
+                "O Parametro enviado na URL é invalido ou nao corresponde ao tipo esperado."
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
+    }
+    
     @ExceptionHandler(RegraNegocioException.class)
     public ResponseEntity<ErroRespostaDTO> tratarRegraNegocio(RegraNegocioException exception){
         ErroRespostaDTO erro = new ErroRespostaDTO(
                 LocalDateTime.now(),
-                400,
+                HttpStatus.BAD_REQUEST.value(),
                 "BAD_REQUEST",
                 exception.getMessage()
         );

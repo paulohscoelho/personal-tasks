@@ -36,7 +36,11 @@ public class TarefaService {
     }
 
     public List<TarefaResponseDTO>  chamarTodos(){
-        return mapper.paraResponseDTOList(repository.findAll());
+        List<Tarefa> lista = repository.findAll();
+        if (lista.isEmpty()){
+            throw new RegraNegocioException("Lista de tarefas vazia ");
+        }
+        return mapper.paraResponseDTOList(lista);
     }
 
     public void remover(Long id){
@@ -48,14 +52,22 @@ public class TarefaService {
 
 
     /// CONTINUAR NA REGRA DE NEGOCIO DO  METODO ATUALIZAR
-    public TarefaResponseDTO atualizarPorId(Long id, TarefaRequestDTO taskAntiga){
-        Tarefa taskAtualizada = repository.findById(id)
+    public TarefaResponseDTO atualizarPorId(Long id, TarefaRequestDTO dadosAtualizados){
+        Tarefa tarefaExistente = repository.findById(id)
                 .orElseThrow(()-> new RegraNegocioException("id "+id+" não encontrado"));
-        taskAtualizada.setTitulo(taskAntiga.titulo());
-        taskAtualizada.setDescricao(taskAntiga.descricao());
-        taskAtualizada.setStatus(taskAntiga.status());
-        taskAtualizada.setDataFim(taskAntiga.dataFim());
-        return mapper.paraResponseDTO( repository.save(taskAtualizada));
+        if ((tarefaExistente.getStatus() == Status.CONCLUIDA) && (dadosAtualizados.status() != Status.CONCLUIDA)){
+            throw new RegraNegocioException("Não é possivel alterar o status de uma tarefa já CONCLUÍDA.");
+        }
+
+        if ((tarefaExistente.getStatus() == Status.CANCELADA) &&(dadosAtualizados.status() != Status.CANCELADA)){
+            throw new RegraNegocioException("Não é possivel alterar o status de uma tarefa já CANCELADA");
+        }
+
+        tarefaExistente.setTitulo(dadosAtualizados.titulo());
+        tarefaExistente.setDescricao(dadosAtualizados.descricao());
+        tarefaExistente.setStatus(dadosAtualizados.status());
+        tarefaExistente.setDataFim(dadosAtualizados.dataFim());
+        return mapper.paraResponseDTO( repository.save(tarefaExistente));
     }
 
     public TarefaResponseDTO chamarPorId(Long id){

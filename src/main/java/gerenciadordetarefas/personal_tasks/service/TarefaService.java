@@ -38,7 +38,7 @@ public class TarefaService {
     public List<TarefaResponseDTO>  chamarTodos(){
         List<Tarefa> lista = repository.findAll();
         if (lista.isEmpty()){
-            throw new RegraNegocioException("Lista de tarefas vazia ");
+            throw new RegraNegocioException("Lista de tarefas está vazia ");
         }
         return mapper.paraResponseDTOList(lista);
     }
@@ -49,12 +49,11 @@ public class TarefaService {
         repository.delete(idEncontrado);
     }
 
-
-
-    /// CONTINUAR NA REGRA DE NEGOCIO DO  METODO ATUALIZAR
     public TarefaResponseDTO atualizarPorId(Long id, TarefaRequestDTO dadosAtualizados){
         Tarefa tarefaExistente = repository.findById(id)
                 .orElseThrow(()-> new RegraNegocioException("id "+id+" não encontrado"));
+        System.out.println("status do banc: "+ tarefaExistente.getStatus());
+        System.out.println("status do dto: "+ dadosAtualizados.status());
         if ((tarefaExistente.getStatus() == Status.CONCLUIDA) && (dadosAtualizados.status() != Status.CONCLUIDA)){
             throw new RegraNegocioException("Não é possivel alterar o status de uma tarefa já CONCLUÍDA.");
         }
@@ -62,11 +61,23 @@ public class TarefaService {
         if ((tarefaExistente.getStatus() == Status.CANCELADA) &&(dadosAtualizados.status() != Status.CANCELADA)){
             throw new RegraNegocioException("Não é possivel alterar o status de uma tarefa já CANCELADA");
         }
+        if (dadosAtualizados.titulo() != null){
+            tarefaExistente.setTitulo(dadosAtualizados.titulo());
+        }
+        if (dadosAtualizados.descricao() != null){
+            tarefaExistente.setDescricao(dadosAtualizados.descricao());
+        }
+        if (dadosAtualizados.status() != null){
+            tarefaExistente.setStatus(dadosAtualizados.status());
+        }
+        if (dadosAtualizados.dataFim() != null){
+            tarefaExistente.setDataFim(dadosAtualizados.dataFim());
+        }
 
-        tarefaExistente.setTitulo(dadosAtualizados.titulo());
-        tarefaExistente.setDescricao(dadosAtualizados.descricao());
-        tarefaExistente.setStatus(dadosAtualizados.status());
-        tarefaExistente.setDataFim(dadosAtualizados.dataFim());
+//        tarefaExistente.setTitulo(dadosAtualizados.titulo());
+//        tarefaExistente.setDescricao(dadosAtualizados.descricao());
+//        tarefaExistente.setStatus(dadosAtualizados.status());
+//        tarefaExistente.setDataFim(dadosAtualizados.dataFim());
         return mapper.paraResponseDTO( repository.save(tarefaExistente));
     }
 

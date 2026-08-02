@@ -46,14 +46,15 @@ public class TarefaService {
     public void remover(Long id){
         Tarefa idEncontrado = repository.findById(id)
                 .orElseThrow( ()-> new RegraNegocioException("id '"+id+"' não encontrado") );
-        repository.delete(idEncontrado);
+        if ((idEncontrado.getStatus() == Status.PENDENTE) || (idEncontrado.getStatus() == Status.CANCELADA)){
+            repository.delete(idEncontrado);
+        }
     }
 
     public TarefaResponseDTO atualizarPorId(Long id, TarefaRequestDTO dadosAtualizados){
         Tarefa tarefaExistente = repository.findById(id)
                 .orElseThrow(()-> new RegraNegocioException("id "+id+" não encontrado"));
-        System.out.println("status do banc: "+ tarefaExistente.getStatus());
-        System.out.println("status do dto: "+ dadosAtualizados.status());
+
         if ((tarefaExistente.getStatus() == Status.CONCLUIDA) && (dadosAtualizados.status() != Status.CONCLUIDA)){
             throw new RegraNegocioException("Não é possivel alterar o status de uma tarefa já CONCLUÍDA.");
         }
@@ -70,14 +71,14 @@ public class TarefaService {
         if (dadosAtualizados.status() != null){
             tarefaExistente.setStatus(dadosAtualizados.status());
         }
-        if (dadosAtualizados.dataFim() != null){
-            tarefaExistente.setDataFim(dadosAtualizados.dataFim());
+        if (dadosAtualizados.dataFim() != null || dadosAtualizados.dataFim() != null){
+            if(tarefaExistente.getDataInicio().isBefore(dadosAtualizados.dataFim())) {
+                tarefaExistente.setDataFim(dadosAtualizados.dataFim());
+            }else {
+                throw new RegraNegocioException("A 'data_do _fim' da tarefa não pode ser igual ou vir antes da 'data_do_inicio' ");
+            }
         }
 
-//        tarefaExistente.setTitulo(dadosAtualizados.titulo());
-//        tarefaExistente.setDescricao(dadosAtualizados.descricao());
-//        tarefaExistente.setStatus(dadosAtualizados.status());
-//        tarefaExistente.setDataFim(dadosAtualizados.dataFim());
         return mapper.paraResponseDTO( repository.save(tarefaExistente));
     }
 
@@ -86,4 +87,13 @@ public class TarefaService {
                 .orElseThrow(()-> new RegraNegocioException("id "+id+" não encontrado"));
         return mapper.paraResponseDTO(tarefa);
     }
+
+    public List<TarefaResponseDTO> chamarPorStatus(Status status){
+        List<Tarefa> tarefas = repository.findByStatus(status);
+        if (tarefas.isEmpty())throw new RegraNegocioException("Lista vazia");
+
+        return tarefas.stream().map(mapper::paraResponseDTO).toList();
+    }
+
+
 }

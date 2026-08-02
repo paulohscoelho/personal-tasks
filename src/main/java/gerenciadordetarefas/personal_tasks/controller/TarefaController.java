@@ -3,12 +3,12 @@ package gerenciadordetarefas.personal_tasks.controller;
 
 import gerenciadordetarefas.personal_tasks.dto.TarefaRequestDTO;
 import gerenciadordetarefas.personal_tasks.dto.TarefaResponseDTO;
+import gerenciadordetarefas.personal_tasks.model.Status;
 import gerenciadordetarefas.personal_tasks.model.Tarefa;
 import gerenciadordetarefas.personal_tasks.service.TarefaService;
 
 
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,11 +28,6 @@ public class TarefaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping
-    public ResponseEntity<List<TarefaResponseDTO>> listTasks(){
-        return ResponseEntity.ok(tarefaService.chamarTodos());
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Tarefa> deleteTask(@PathVariable Long id){
         tarefaService.remover(id);
@@ -42,12 +37,20 @@ public class TarefaController {
     @PutMapping("/{id}")
     public ResponseEntity<TarefaResponseDTO> updateTask(@PathVariable Long id, @RequestBody TarefaRequestDTO request){
         TarefaResponseDTO atualizandoTask = tarefaService.atualizarPorId(id,request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(atualizandoTask);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TarefaResponseDTO> getTask(@PathVariable Long id){
         return ResponseEntity.ok(tarefaService.chamarPorId(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TarefaResponseDTO>> listTasks(@RequestParam(required = false) Status status){
+        if (status != null){
+            return ResponseEntity.ok(tarefaService.chamarPorStatus(status));
+        }
+        return ResponseEntity.ok(tarefaService.chamarTodos());
     }
 
 

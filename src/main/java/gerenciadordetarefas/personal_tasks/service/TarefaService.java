@@ -75,7 +75,7 @@ public class TarefaService {
             if(tarefaExistente.getDataInicio().isBefore(dadosAtualizados.dataFim())) {
                 tarefaExistente.setDataFim(dadosAtualizados.dataFim());
             }else {
-                throw new RegraNegocioException("A 'data_do _fim' da tarefa não pode ser igual ou vir antes da 'data_do_inicio' ");
+                throw new RegraNegocioException("A 'data_do_fim' da tarefa não pode ser igual ou vir antes da 'data_do_inicio' ");
             }
         }
 

@@ -71,7 +71,7 @@ public class TarefaService {
         if (dadosAtualizados.status() != null){
             tarefaExistente.setStatus(dadosAtualizados.status());
         }
-        if (dadosAtualizados.dataFim() != null || dadosAtualizados.dataFim() != null){
+        if (dadosAtualizados.dataFim() != null){
             if(tarefaExistente.getDataInicio().isBefore(dadosAtualizados.dataFim())) {
                 tarefaExistente.setDataFim(dadosAtualizados.dataFim());
             }else {

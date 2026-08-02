@@ -35,7 +35,7 @@ public class RestExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
     }
-    
+
     @ExceptionHandler(RegraNegocioException.class)
     public ResponseEntity<ErroRespostaDTO> tratarRegraNegocio(RegraNegocioException exception){
         ErroRespostaDTO erro = new ErroRespostaDTO(

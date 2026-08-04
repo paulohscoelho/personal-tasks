@@ -1,1 +1,3 @@
 gerenciadordetarefas\personal_tasks\ApplicationTests.class
+gerenciadordetarefas\personal_tasks\service\TarefaServiceTest.class
+gerenciadordetarefas\personal_tasks\service\TarefaServiceTest$salvarTarefa.class

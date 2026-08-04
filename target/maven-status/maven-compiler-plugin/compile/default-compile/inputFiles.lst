@@ -1,2 +1,12 @@
 C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\Application.java
-C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\model\gerenciador.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\controller\TarefaController.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\dto\TarefaRequestDTO.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\dto\TarefaResponseDTO.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\exception\ErroRespostaDTO.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\exception\RegraNegocioException.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\exception\RestExceptionHandler.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\mapper\TarefaMapper.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\model\Status.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\model\Tarefa.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\repository\TarefaRepository.java
+C:\Users\paulo\Downloads\personal-tasks\personal-tasks\src\main\java\gerenciadordetarefas\personal_tasks\service\TarefaService.java

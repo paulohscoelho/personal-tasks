@@ -15,7 +15,7 @@ public class TarefaMapper {
         tarefa.setTitulo(request.titulo());
         tarefa.setDescricao(request.descricao());
         tarefa.setStatus(request.status());
-        tarefa.setDataFim(request.dataFim());
+        tarefa.setDataFim(request.dataInicio());
         return tarefa;
     }
 

@@ -10,7 +10,6 @@ import gerenciadordetarefas.personal_tasks.repository.TarefaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -23,9 +22,15 @@ public class TarefaService {
 
         Tarefa tarefa = mapper.paraTarefa(request);
 
-        if(tarefa.getDataFim().isBefore(LocalDateTime.now())){
-            throw new RegraNegocioException(
-                    "A data de término da tarefa não pode ser anterior a data do inicio da tarefa");
+        if (tarefa.getDataInicio() == null){
+            throw new RegraNegocioException("data inicio tem que ser preenchida");
+        }
+
+        if (tarefa.getDataFim() != null){
+            if (tarefa.getDataFim().isBefore(tarefa.getDataInicio() )|| tarefa.getDataFim().isEqual(tarefa.getDataInicio())) {
+                throw new RegraNegocioException(
+                        "A data de término da tarefa não pode ser igual ou anterior a data do inicio da tarefa");
+            }
         }
         if (tarefa.getStatus() == Status.CONCLUIDA){
             throw new RegraNegocioException("A tarefa não pode ser criada como Status: 'CONCLUIDA'");
@@ -48,6 +53,8 @@ public class TarefaService {
                 .orElseThrow( ()-> new RegraNegocioException("id '"+id+"' não encontrado") );
         if ((idEncontrado.getStatus() == Status.PENDENTE) || (idEncontrado.getStatus() == Status.CANCELADA)){
             repository.delete(idEncontrado);
+        }else {
+            throw new RegraNegocioException("Não pode excluir tarefa em Status de 'PENDENTE' ou 'CANCELADA'");
         }
     }
 
@@ -71,14 +78,20 @@ public class TarefaService {
         if (dadosAtualizados.status() != null){
             tarefaExistente.setStatus(dadosAtualizados.status());
         }
-        if (dadosAtualizados.dataFim() != null){
-            if(tarefaExistente.getDataInicio().isBefore(dadosAtualizados.dataFim())) {
-                tarefaExistente.setDataFim(dadosAtualizados.dataFim());
-            }else {
-                throw new RegraNegocioException("A 'data_do_fim' da tarefa não pode ser igual ou vir antes da 'data_do_inicio' ");
-            }
+        if (dadosAtualizados.dataInicio() != null) {
+            tarefaExistente.setDataInicio(dadosAtualizados.dataInicio());
         }
 
+        if (dadosAtualizados.dataFim() != null) {
+            tarefaExistente.setDataFim(dadosAtualizados.dataFim());
+        }
+
+
+        if (tarefaExistente.getDataFim() != null) {
+            if (tarefaExistente.getDataFim().isBefore(tarefaExistente.getDataInicio()) || tarefaExistente.getDataFim().isEqual(tarefaExistente.getDataInicio())) {
+                throw new RegraNegocioException("A data de término não pode ser igual ou anterior à data de início");
+            }
+        }
         return mapper.paraResponseDTO( repository.save(tarefaExistente));
     }
 

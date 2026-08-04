@@ -8,9 +8,8 @@ public record TarefaRequestDTO(
         String titulo,
         String descricao,
         Status status,
+        LocalDateTime dataInicio,
         LocalDateTime dataFim
 ) {
-    public TarefaRequestDTO{
-        status = (status == null) ? Status.PENDENTE : status;
-    }
+
 }

@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "personal-tasks")
-@EntityListeners(AuditingEntityListener.class)
+
 public class Tarefa {
 
     @Id
@@ -36,7 +36,7 @@ public class Tarefa {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @CreatedDate
+
     @Column(nullable = false , updatable = false)
     private LocalDateTime dataInicio;
 

@@ -43,7 +43,7 @@ public class TarefaService {
     public List<TarefaResponseDTO>  chamarTodos(){
         List<Tarefa> lista = repository.findAll();
         if (lista.isEmpty()){
-            throw new RegraNegocioException("Lista de tarefas está vazia ");
+            throw new RegraNegocioException("Lista de tarefas está vazia");
         }
         return mapper.paraResponseDTOList(lista);
     }

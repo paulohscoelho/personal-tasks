@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -275,16 +277,83 @@ public class TarefaServiceTest {
 
     }
 
+    @Nested
+    class chamarTodos{
 
-    ///começar com questionario DO METODO SAVE GEMINI
+        @Test
+        void deveBuscarTodasAsTarefasComSucesso_quandoExistiremRegitros(){
+            var agora = LocalDateTime.now();
+            Tarefa tarefa1 = new Tarefa(
+                    1L,
+                    "Estudar testes",
+                    "criar testes unitario do service",
+                    Status.PENDENTE,
+                    agora,agora
 
-    /// Próximo Passo (Amanhã)
-    /// Assim que você retornar e enviar a sua mensagem de abertura:
-    ///
-    /// Iniciaremos com um pequeno questionário de fixação focado na lógica de testes do método salvarTarefa (regras do Mockito, comportamentos do Arrange/Act/Assert, var vs record e mocking de repositório).
-    ///
-    /// Em seguida, avançaremos para o próximo método do seu Service!
-    ///
-    /// Descanse a mente e até amanhã! 🚀
+            );
+
+            Tarefa tarefa2 = new Tarefa(
+                    2L,
+                    "Estudar java",
+                    "criar metodos service",
+                    Status.PENDENTE,
+                    agora,agora
+            );
+
+            List<Tarefa> listaDeTarefas =  List.of(tarefa1,tarefa2);
+
+            TarefaResponseDTO dto1 = new TarefaResponseDTO(
+                    1L,
+                    "Estudar testes",
+                    "criar testes unitarios no service",
+                    Status.PENDENTE,
+                    agora,agora
+            );
+
+            TarefaResponseDTO dto2 = new TarefaResponseDTO(
+                    2L,
+                    "Estudar java",
+                    "criar metodos service",
+                    Status.PENDENTE,
+                    agora,agora
+            );
+
+            List<TarefaResponseDTO> listaDeResponseDTOs =  List.of(dto1,dto2);
+
+            when(repository.findAll()).thenReturn(listaDeTarefas);
+            when(mapper.paraResponseDTOList(listaDeTarefas)).thenReturn(listaDeResponseDTOs);
+
+            var resultado = service.chamarTodos();
+
+            assertNotNull(resultado);
+            assertFalse(resultado.isEmpty());
+            assertEquals(2,resultado.size());
+            assertEquals(1L,resultado.get(0).id());
+
+            verify(repository,times(1)).findAll();
+            verify(mapper,times(1)).paraResponseDTOList(listaDeTarefas);
+
+
+        }
+
+        @Test
+        void DeveLancarExcecao_Quando_BuscarEmBancoDadosVazio(){
+            List<Tarefa> listaVazia = List.of();
+
+            when(repository.findAll()).thenReturn(listaVazia);
+
+            RegraNegocioException exception = assertThrows(
+                    RegraNegocioException.class,()->
+                            service.chamarTodos());
+
+            assertEquals("Lista de tarefas está vazia", exception.getMessage());
+
+            verify(repository,times(1)).findAll();
+            verify(mapper,never()).paraResponseDTOList(any());
+        }
+    }
+
+
+
 
 }

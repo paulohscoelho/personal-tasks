@@ -51,10 +51,10 @@ public class TarefaService {
     public void remover(Long id){
         Tarefa idEncontrado = repository.findById(id)
                 .orElseThrow( ()-> new RegraNegocioException("id '"+id+"' não encontrado") );
-        if ((idEncontrado.getStatus() == Status.PENDENTE) || (idEncontrado.getStatus() == Status.CANCELADA)){
+        if ((idEncontrado.getStatus() == Status.CONCLUIDA) || (idEncontrado.getStatus() == Status.CANCELADA)){
             repository.delete(idEncontrado);
         }else {
-            throw new RegraNegocioException("Não pode excluir tarefa em Status de 'PENDENTE' ou 'CANCELADA'");
+            throw new RegraNegocioException("Não pode excluir tarefa em Status de 'PENDENTE' ou 'EM_ANDAMENTO'");
         }
     }
 

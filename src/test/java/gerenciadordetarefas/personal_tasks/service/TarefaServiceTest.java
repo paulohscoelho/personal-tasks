@@ -15,8 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -337,7 +337,7 @@ public class TarefaServiceTest {
         }
 
         @Test
-        void DeveLancarExcecao_Quando_BuscarEmBancoDadosVazio(){
+        void DeveLancarExcecao_quandoBuscarEmBancoDadosVazio(){
             List<Tarefa> listaVazia = List.of();
 
             when(repository.findAll()).thenReturn(listaVazia);
@@ -353,6 +353,78 @@ public class TarefaServiceTest {
         }
     }
 
+    @Nested
+    class remover{
+
+        @Test
+        void deveDeletarTarefaComSucesso() {
+            LocalDateTime inicio = LocalDateTime.of(2026, 8, 8, 0, 0);
+            LocalDateTime fim = LocalDateTime.of(2026, 10, 10, 10, 0);
+            Long id = 1L;
+            Tarefa tarefa = new Tarefa(
+                    id,
+                    "Estudar testes",
+                    "criar testes unitario do service",
+                    Status.CONCLUIDA,
+                    inicio,
+                    fim
+
+            );
+
+            when(repository.findById(id)).thenReturn(Optional.of(tarefa));
+
+            service.remover(id);
+
+            verify(repository,times(1)).findById(id);
+            verify(repository,times(1)).delete(tarefa);
+        }
+
+        @Test
+        void deveRetornarExcecao_quandoIdNaoForEncontrado(){
+            Long idInexistente = 99L;
+
+            when(repository.findById(idInexistente)).thenReturn(Optional.empty());
+
+            RegraNegocioException exception = assertThrows(
+                    RegraNegocioException.class,()->
+                            service.remover(idInexistente)
+            );
+
+            assertEquals("id '99' não encontrado",exception.getMessage());
+
+            verify(repository,times(1)).findById(idInexistente);
+            verify(repository,never()).delete(any());
+
+        }
+
+        @Test
+        void deveLancarExcecaoAoExcluirTarefaPendenteOuEmAndamento(){
+            LocalDateTime inicio = LocalDateTime.of(2026,07,07,1,0);
+            LocalDateTime fim = LocalDateTime.of(2026,07,10,10,10);
+            Long id = 1L;
+            Tarefa tarefaComStatusEM_ANDAMENTO = new Tarefa(
+                    id,
+                    "Teste unitario",
+                    "teste",
+                    Status.EM_ANDAMENTO,
+                    inicio,
+                    fim
+            );
+
+            when(repository.findById(id)).thenReturn(Optional.of(tarefaComStatusEM_ANDAMENTO));
+
+            RegraNegocioException exception = assertThrows(
+                    RegraNegocioException.class,()->
+                            service.remover(id)
+            );
+
+            assertEquals("Não pode excluir tarefa em Status de 'PENDENTE' ou 'EM_ANDAMENTO'",exception.getMessage());
+            verify(repository,times(1)).findById(id);
+            verify(repository,never()).delete(any());
+
+
+        }
+    }
 
 
 

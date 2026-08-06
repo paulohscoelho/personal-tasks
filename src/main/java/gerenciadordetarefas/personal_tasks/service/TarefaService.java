@@ -88,7 +88,8 @@ public class TarefaService {
 
 
         if (tarefaExistente.getDataFim() != null) {
-            if (tarefaExistente.getDataFim().isBefore(tarefaExistente.getDataInicio()) || tarefaExistente.getDataFim().isEqual(tarefaExistente.getDataInicio())) {
+            if (tarefaExistente.getDataFim().isBefore(tarefaExistente.getDataInicio()) ||
+                    tarefaExistente.getDataFim().isEqual(tarefaExistente.getDataInicio())) {
                 throw new RegraNegocioException("A data de término não pode ser igual ou anterior à data de início");
             }
         }

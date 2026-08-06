@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.internal.invocation.finder.VerifiableInvocationsFinder;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
@@ -621,6 +622,131 @@ public class TarefaServiceTest {
             verify(mapper,times(1)).paraResponseDTO(tarefaExistenteNoBanco);
         }
 
+        @Test
+        void deveLancarExcecao_quandoDataFimForAnteriorOuIgualADataInicio(){
+            LocalDateTime inicio = LocalDateTime.of(2027,7,2,10,0);
+            LocalDateTime fim = LocalDateTime.of(2027,7,1,9,0);
+            Long id = 1L;
+
+            Tarefa tarefaDoBanco = new Tarefa(
+                    id,
+                    "Test unitario",
+                    "Test unitario",
+                    Status.PENDENTE,
+                    LocalDateTime.of(2027,7,3,5,0),
+                    LocalDateTime.of(2027,7,5,10,0)
+            );
+
+            TarefaRequestDTO requestDTO = new TarefaRequestDTO(
+
+                    "Test unitario",
+                    "Test unitario",
+                    Status.PENDENTE,
+                    inicio,
+                    fim
+            );
+
+            when(repository.findById(id)).thenReturn(Optional.of(tarefaDoBanco));
+
+            RegraNegocioException exception = assertThrows(
+                    RegraNegocioException.class,()->
+                            service.atualizarPorId(id,requestDTO)
+            );
+
+            assertEquals("A data de término não pode ser igual ou anterior à data de início",exception.getMessage());
+            verify(repository,times(1)).findById(id);
+            verify(repository,never()).save(any());
+            verify(mapper,never()).paraResponseDTO(any());
+
+        }
+
+        @Test
+        void deveLancarExcecao_quandoDataFimForIgualADataInicio(){
+            LocalDateTime inicio = LocalDateTime.of(2027,7,2,10,0);
+            LocalDateTime fim = LocalDateTime.of(2027,7,2,10,0);
+            Long id = 1L;
+
+            Tarefa tarefaDoBanco = new Tarefa(
+                    id,
+                    "Test unitario",
+                    "Test unitario",
+                    Status.PENDENTE,
+                    LocalDateTime.of(2027,7,3,5,0),
+                    LocalDateTime.of(2027,7,5,10,0)
+            );
+
+            TarefaRequestDTO requestDTO = new TarefaRequestDTO(
+
+                    "Test unitario",
+                    "Test unitario",
+                    Status.PENDENTE,
+                    inicio,
+                    fim
+            );
+
+            when(repository.findById(id)).thenReturn(Optional.of(tarefaDoBanco));
+
+            RegraNegocioException exception = assertThrows(
+                    RegraNegocioException.class,()->
+                            service.atualizarPorId(id,requestDTO)
+            );
+
+            assertEquals("A data de término não pode ser igual ou anterior à data de início",exception.getMessage());
+            verify(repository,times(1)).findById(id);
+            verify(repository,never()).save(any());
+            verify(mapper,never()).paraResponseDTO(any());
+
+        }
+
+        @Test
+        void deveAtualizarApenasCamposNaoNulos_quandoRequestConterCamposNulos(){
+            LocalDateTime inicio = LocalDateTime.of(2027,7,2,10,0);
+            LocalDateTime fim = LocalDateTime.of(2027,7,2,10,0);
+            Long id = 1L;
+
+            Tarefa tarefaDoBanco = new Tarefa(
+                    id,
+                    "Test unitario",
+                    "Test unitario",
+                    Status.PENDENTE,
+                    LocalDateTime.of(2027,7,3,5,0),
+                    LocalDateTime.of(2027,7,5,10,0)
+            );
+
+            TarefaRequestDTO requestDTO = new TarefaRequestDTO(
+
+                    "Test unitario Atualizado",
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            TarefaResponseDTO responseDTO = new TarefaResponseDTO(
+                    id,
+                    "Test unitario Atualizado",
+                    "Test unitario",
+                    Status.PENDENTE,
+                    LocalDateTime.of(2027,7,3,5,0),
+                    LocalDateTime.of(2027,7,5,10,0)
+            );
+
+            when(repository.findById(id)).thenReturn(Optional.of(tarefaDoBanco));
+            when(repository.save(any())).thenReturn(tarefaDoBanco);
+            when(mapper.paraResponseDTO(any())).thenReturn(responseDTO);
+
+            var resultado = service.atualizarPorId(id,requestDTO);
+
+            assertNotNull(resultado);
+            assertEquals("Test unitario",resultado.descricao());
+            assertEquals(Status.PENDENTE,resultado.status());
+            assertEquals(LocalDateTime.of(2027,7,3,5,0),resultado.dataInicio());
+            assertEquals(LocalDateTime.of(2027,7,5,10,0),resultado.dataFim());
+
+            verify(repository,times(1)).findById(id);
+            verify(repository,times(1)).save(any());
+            verify(mapper,times(1)).paraResponseDTO(tarefaDoBanco);
+        }
 
     }
 

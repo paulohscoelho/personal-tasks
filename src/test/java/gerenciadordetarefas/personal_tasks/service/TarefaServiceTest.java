@@ -426,6 +426,203 @@ public class TarefaServiceTest {
         }
     }
 
+    @Nested
+    class atualizarPorId{
+
+        @Test
+        void deveAtualizarTarefaComSucesso(){
+            LocalDateTime inicio = LocalDateTime.of(2026,07,07,10,0);
+            LocalDateTime fim = LocalDateTime.of(2026,07,8,12,0);
+            Long id = 1L;
+            Tarefa tarefaExistente = new Tarefa(
+                    id,
+                    "titulo antigo",
+                    "descricao antiga",
+                    Status.PENDENTE,
+                    inicio,fim
+            );
+
+            TarefaRequestDTO request = new TarefaRequestDTO(
+                    "Estudar testes",
+                    "criar testes unitarios no service",
+                    Status.PENDENTE,
+                    inicio,
+                    fim
+            );
+
+            TarefaResponseDTO response = new TarefaResponseDTO(
+                    id,
+                    "Estudar testes",
+                    "criar testes unitarios no service",
+                    Status.PENDENTE,
+                    inicio,fim
+            );
+            when(repository.findById(id)).thenReturn(Optional.of(tarefaExistente));
+            when(repository.save(any())).thenReturn(tarefaExistente);
+            when(mapper.paraResponseDTO(any())).thenReturn(response);
+
+            var resultado = service.atualizarPorId(id,request);
+
+            assertNotNull(resultado);
+            assertEquals(request.titulo(), resultado.titulo());
+
+            verify(repository,times(1)).findById(id);
+            verify(repository,times(1)).save(any());
+            verify(mapper,times(1)).paraResponseDTO(any());
+        }
+
+
+        @Test
+        void deveLancarExcecao_quandoTarefaNaoExistir(){
+            LocalDateTime inicio = LocalDateTime.of(2026,07,07,10,0);
+            LocalDateTime fim = LocalDateTime.of(2026,07,8,12,0);
+            Long idInexistente = 99L;
+            TarefaRequestDTO requestDTO = new TarefaRequestDTO(
+                    "Estudar testes",
+                    "criar testes unitarios no service",
+                    Status.PENDENTE,
+                    inicio,fim
+            );
+            when(repository.findById(idInexistente)).thenReturn(Optional.empty());
+
+            RegraNegocioException exception = assertThrows(
+                    RegraNegocioException.class,()->
+                            service.atualizarPorId(idInexistente,requestDTO)
+            );
+
+            assertEquals("id '99' não encontrado",exception.getMessage());
+
+            verify(repository,times(1)).findById(idInexistente);
+            verify(repository,never()).save(any());
+            verify(mapper,never()).paraResponseDTO(any());
+        }
+
+        @Test
+        void deveLancarExcecao_quandoStatusJaEstiverCONCLUIDO(){
+            LocalDateTime inicio = LocalDateTime.of(2026,7,7,10,0);
+            LocalDateTime fim = LocalDateTime.of(2026,7,8,12,0);
+            Long id = 1L;
+
+            Tarefa tarefa = new Tarefa(
+                    id,
+                    "Estudar testes",
+                    "criar testes unitario do service",
+                    Status.CONCLUIDA,
+                    inicio,
+                    fim
+            );
+
+            TarefaRequestDTO request = new TarefaRequestDTO(
+
+                    "Estudar testes",
+                    "criar testes unitario do service",
+                    Status.EM_ANDAMENTO,
+                    inicio,
+                    fim
+
+            );
+
+            when(repository.findById(1L)).thenReturn(Optional.of(tarefa));
+
+            RegraNegocioException exception = assertThrows(
+                    RegraNegocioException.class,()->
+                        service.atualizarPorId(id,request)
+            );
+
+            assertEquals("Não é possível alterar o status de uma tarefa já CONCLUÍDA.",exception.getMessage());
+            verify(repository,times(1)).findById(id);
+            verify(repository,never()).save(any());
+            verify(mapper,never()).paraResponseDTO(any());
+
+        }
+
+        @Test
+        void deveLancarExcecao_quandoStatusJaEstiverCANCELADA(){
+            LocalDateTime inicio = LocalDateTime.of(2026,7,7,10,0);
+            LocalDateTime fim = LocalDateTime.of(2026,7,8,12,0);
+            Long id = 1L;
+
+            Tarefa tarefa = new Tarefa(
+                    id,
+                    "Estudar testes",
+                    "criar testes unitario do service",
+                    Status.CANCELADA,
+                    inicio,
+                    fim
+            );
+
+            TarefaRequestDTO request = new TarefaRequestDTO(
+
+                    "Estudar testes",
+                    "criar testes unitario do service",
+                    Status.EM_ANDAMENTO,
+                    inicio,
+                    fim
+
+            );
+
+            when(repository.findById(1L)).thenReturn(Optional.of(tarefa));
+
+            RegraNegocioException exception = assertThrows(
+                    RegraNegocioException.class,()->
+                            service.atualizarPorId(id,request)
+            );
+
+            assertEquals("Não é possível alterar o status de uma tarefa já CANCELADA.",exception.getMessage());
+            verify(repository,times(1)).findById(id);
+            verify(repository,never()).save(any());
+            verify(mapper,never()).paraResponseDTO(any());
+
+        }
+
+        @Test
+        void deveAlterarOutrosCampos_quandoManterStatusCONCLUIDO(){
+            LocalDateTime inicio = LocalDateTime.of(2026,7,7,10,0);
+            LocalDateTime fim = LocalDateTime.of(2026,7,8,12,0);
+            Long id = 1L;
+            Tarefa tarefaExistenteNoBanco = new Tarefa(
+                    id,
+                    "Tarefa Antiga",
+                    "Tarefa Antiga",
+                    Status.CONCLUIDA,
+                    inicio,
+                    fim
+            );
+
+            TarefaRequestDTO requestDTO  = new TarefaRequestDTO(
+
+                    "Tarefa Nova",
+                    "Tarefa Nova",
+                    Status.CONCLUIDA,
+                    inicio,
+                    fim
+            );
+
+            TarefaResponseDTO responseDTO  = new TarefaResponseDTO(
+                    id,
+                    "Tarefa Nova",
+                    "Tarefa Nova",
+                    Status.CONCLUIDA,
+                    inicio,
+                    fim
+            );
+
+            when(repository.findById(id)).thenReturn(Optional.of(tarefaExistenteNoBanco));
+            when(repository.save(any())).thenReturn(tarefaExistenteNoBanco);
+            when(mapper.paraResponseDTO(any())).thenReturn(responseDTO);
+
+            var resultado = service.atualizarPorId(id,requestDTO);
+
+            assertNotNull(resultado);
+            assertEquals(responseDTO.titulo() ,resultado.titulo());
+
+            verify(repository,times(1)).findById(id);
+            verify(repository,times(1)).save(tarefaExistenteNoBanco);
+            verify(mapper,times(1)).paraResponseDTO(tarefaExistenteNoBanco);
+        }
+
+
+    }
 
 
 }

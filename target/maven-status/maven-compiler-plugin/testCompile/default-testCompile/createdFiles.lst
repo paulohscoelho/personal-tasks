@@ -1,5 +1,6 @@
 gerenciadordetarefas\personal_tasks\ApplicationTests.class
 gerenciadordetarefas\personal_tasks\service\TarefaServiceTest$chamarTodos.class
 gerenciadordetarefas\personal_tasks\service\TarefaServiceTest$salvarTarefa.class
+gerenciadordetarefas\personal_tasks\service\TarefaServiceTest$atualizarPorId.class
 gerenciadordetarefas\personal_tasks\service\TarefaServiceTest$remover.class
 gerenciadordetarefas\personal_tasks\service\TarefaServiceTest.class

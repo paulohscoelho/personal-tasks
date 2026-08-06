@@ -60,14 +60,14 @@ public class TarefaService {
 
     public TarefaResponseDTO atualizarPorId(Long id, TarefaRequestDTO dadosAtualizados){
         Tarefa tarefaExistente = repository.findById(id)
-                .orElseThrow(()-> new RegraNegocioException("id "+id+" não encontrado"));
+                .orElseThrow(()-> new RegraNegocioException("id '"+id+"' não encontrado"));
 
-        if ((tarefaExistente.getStatus() == Status.CONCLUIDA) && (dadosAtualizados.status() != Status.CONCLUIDA)){
-            throw new RegraNegocioException("Não é possivel alterar o status de uma tarefa já CONCLUÍDA.");
+        if (tarefaExistente.getStatus() == Status.CONCLUIDA && dadosAtualizados.status() != Status.CONCLUIDA) {
+            throw new RegraNegocioException("Não é possível alterar o status de uma tarefa já CONCLUÍDA.");
         }
 
-        if ((tarefaExistente.getStatus() == Status.CANCELADA) &&(dadosAtualizados.status() != Status.CANCELADA)){
-            throw new RegraNegocioException("Não é possivel alterar o status de uma tarefa já CANCELADA");
+        if (tarefaExistente.getStatus() == Status.CANCELADA && dadosAtualizados.status() != Status.CANCELADA) {
+            throw new RegraNegocioException("Não é possível alterar o status de uma tarefa já CANCELADA.");
         }
         if (dadosAtualizados.titulo() != null){
             tarefaExistente.setTitulo(dadosAtualizados.titulo());

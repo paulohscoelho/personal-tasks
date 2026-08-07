@@ -750,5 +750,64 @@ public class TarefaServiceTest {
 
     }
 
+    @Nested
+    class chamarPorId{
+
+        @Test
+        void deveRetornarATarefaPorIdComSucesso(){
+            LocalDateTime inicio = LocalDateTime.of(2026,07,07,10,0);
+            LocalDateTime fim = LocalDateTime.of(2026,07,8,12,0);
+            Long id = 1L;
+            Tarefa tarefa  = new Tarefa(
+                    id,
+                    "titulo",
+                    "descricao",
+                    Status.PENDENTE,
+                    inicio,fim
+            );
+
+            TarefaResponseDTO response  = new TarefaResponseDTO(
+                    id,
+                    "titulo",
+                    "descricao",
+                    Status.PENDENTE,
+                    inicio,fim
+            );
+
+            when(repository.findById(id)).thenReturn(Optional.of(tarefa));
+            when(mapper.paraResponseDTO(tarefa)).thenReturn(response);
+
+            var resultado = service.chamarPorId(id);
+
+            assertNotNull(resultado);
+            assertEquals(response.id(),resultado.id());
+            assertEquals(response.titulo(),resultado.titulo());
+            assertEquals(response.descricao(),resultado.descricao());
+            verify(repository,times(1)).findById(id);
+            verify(mapper,times(1)).paraResponseDTO(tarefa);
+
+        }
+
+        @Test
+        void deveLancarExcecao_quandoIdNãoForEncontrado(){
+            Long idInexistente = 99L;
+
+            when(repository.findById(idInexistente)).thenReturn(Optional.empty());
+
+            RegraNegocioException exception = assertThrows(
+                    RegraNegocioException.class,()->
+                            service.chamarPorId(idInexistente)
+            );
+
+            assertEquals("id não encontrado",exception.getMessage());
+            verify(repository,times(1)).findById(idInexistente);
+            verify(mapper,never()).paraResponseDTO(any());
+        }
+    }
+
+    @Nested
+    class chamarPorStatus{
+
+    }
 
 }

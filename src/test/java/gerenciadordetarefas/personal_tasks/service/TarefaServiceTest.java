@@ -808,6 +808,77 @@ public class TarefaServiceTest {
     @Nested
     class chamarPorStatus{
 
+        @Test
+        void deveRetornarComSucesso_quandoConsultarPorStatus() {
+            LocalDateTime inicio = LocalDateTime.of(2026,07,07,10,0);
+            LocalDateTime fim = LocalDateTime.of(2026,07,07,10,0);
+            Tarefa tarefa1 = new Tarefa(
+                    1L,
+                    "estudar teste unitario",
+                    "teste unitario",
+                    Status.PENDENTE,
+                    inicio, fim
+            );
+
+            Tarefa tarefa2 = new Tarefa(
+                    2L,
+                    "estudar java",
+                    "estudar java",
+                    Status.PENDENTE,
+                    inicio, fim
+            );
+
+            List<Tarefa> listaTarefa = List.of(tarefa1,tarefa2);
+
+            TarefaResponseDTO response1 = new TarefaResponseDTO(
+                    1L,
+                    "estudar teste unitario",
+                    "teste unitario",
+                    Status.PENDENTE,
+                    inicio, fim
+            );
+
+            TarefaResponseDTO response2 = new TarefaResponseDTO(
+                    2L,
+                    "estudar java",
+                    "estudar java",
+                    Status.PENDENTE,
+                    inicio, fim
+            );
+
+
+
+            when(repository.findByStatus(Status.PENDENTE)).thenReturn(listaTarefa);
+            when(mapper.paraResponseDTO(tarefa1)).thenReturn(response1);
+            when(mapper.paraResponseDTO(tarefa2)).thenReturn(response2);
+
+            var resultado = service.chamarPorStatus(Status.PENDENTE);
+
+            assertNotNull(resultado);
+            assertEquals(2,resultado.size());
+            assertEquals(response1.id(), resultado.get(0).id());
+            assertEquals(response2.id(),resultado.get(1).id());
+
+            verify(repository,times(1)).findByStatus(Status.PENDENTE);
+            verify(mapper,times(2)).paraResponseDTO(any());
+        }
+
+        @Test
+        void deveLancarExcecao_quandoListaEstiverVazia(){
+            Status status = Status.CONCLUIDA;
+            when(repository.findByStatus(status)).thenReturn(List.of());
+
+            RegraNegocioException exception = assertThrows(
+                    RegraNegocioException.class,()->
+                            service.chamarPorStatus(status)
+            );
+
+            assertEquals("Lista vazia",exception.getMessage());
+            verify(repository,times(1)).findByStatus(status);
+            verify(mapper,never()).paraResponseDTO(any());
+        }
+
+
     }
 
 }

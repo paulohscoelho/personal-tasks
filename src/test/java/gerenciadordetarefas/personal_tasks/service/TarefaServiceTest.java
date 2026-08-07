@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.internal.invocation.finder.VerifiableInvocationsFinder;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
@@ -358,7 +357,7 @@ public class TarefaServiceTest {
     class remover{
 
         @Test
-        void deveDeletarTarefaComSucesso() {
+        void deveDeletarTarefaComSucessoComStatusCOMCONCLUIDA() {
             LocalDateTime inicio = LocalDateTime.of(2026, 8, 8, 0, 0);
             LocalDateTime fim = LocalDateTime.of(2026, 10, 10, 10, 0);
             Long id = 1L;
@@ -367,6 +366,29 @@ public class TarefaServiceTest {
                     "Estudar testes",
                     "criar testes unitario do service",
                     Status.CONCLUIDA,
+                    inicio,
+                    fim
+
+            );
+
+            when(repository.findById(id)).thenReturn(Optional.of(tarefa));
+
+            service.remover(id);
+
+            verify(repository,times(1)).findById(id);
+            verify(repository,times(1)).delete(tarefa);
+        }
+
+        @Test
+        void deveDeletarTarefaComSucessoComStatusCOMCANCELADA() {
+            LocalDateTime inicio = LocalDateTime.of(2026, 8, 8, 0, 0);
+            LocalDateTime fim = LocalDateTime.of(2026, 10, 10, 10, 0);
+            Long id = 1L;
+            Tarefa tarefa = new Tarefa(
+                    id,
+                    "Estudar testes",
+                    "criar testes unitario do service",
+                    Status.CANCELADA,
                     inicio,
                     fim
 

@@ -98,7 +98,7 @@ public class TarefaService {
 
     public TarefaResponseDTO chamarPorId(Long id){
         Tarefa tarefa = repository.findById(id)
-                .orElseThrow(()-> new RegraNegocioException("id "+id+" não encontrado"));
+                .orElseThrow(()-> new RegraNegocioException("id não encontrado"));
         return mapper.paraResponseDTO(tarefa);
     }
 

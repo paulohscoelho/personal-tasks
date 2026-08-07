@@ -1,5 +1,9 @@
-/target/
-/.idea/
+target/
+.idea/
 *.class
 *.jar
 *.iml
+
+# Regras locais do Cline (Não enviar para o GitHub)
+.clinerules
+.clinerules/

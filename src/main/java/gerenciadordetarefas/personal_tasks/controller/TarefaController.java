@@ -8,6 +8,7 @@ import gerenciadordetarefas.personal_tasks.model.Tarefa;
 import gerenciadordetarefas.personal_tasks.service.TarefaService;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class TarefaController {
     private final TarefaService tarefaService;
 
     @PostMapping
-    public ResponseEntity<TarefaResponseDTO> saveTask(@RequestBody TarefaRequestDTO request){
+    public ResponseEntity<TarefaResponseDTO> saveTask(@Valid @RequestBody TarefaRequestDTO request){
         TarefaResponseDTO response = tarefaService.salvarTarefa(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -35,7 +36,7 @@ public class TarefaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TarefaResponseDTO> updateTask(@PathVariable Long id, @RequestBody TarefaRequestDTO request){
+    public ResponseEntity<TarefaResponseDTO> updateTask(@Valid @PathVariable Long id, @RequestBody TarefaRequestDTO request){
         TarefaResponseDTO atualizandoTask = tarefaService.atualizarPorId(id,request);
         return ResponseEntity.ok(atualizandoTask);
     }

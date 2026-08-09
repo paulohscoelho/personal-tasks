@@ -7,14 +7,14 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 public record TarefaRequestDTO(
-     //   @NotBlank(message = "título é obrigatório")
-        String titulo,
+     @NotBlank(message = "título é obrigatório")
+     String titulo,
 
-      //  @NotBlank(message = "descrição é obrigatória")
-        String descricao,
+     @NotBlank(message = "descrição é obrigatória")
+     String descricao,
 
-      //  @NotNull(message = "status é obrigatório")
-        Status status,
+     @NotNull(message = "status é obrigatório")
+     Status status,
 
      @NotNull(message = "data início é obrigatória")
      @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

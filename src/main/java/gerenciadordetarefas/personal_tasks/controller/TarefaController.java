@@ -24,19 +24,19 @@ public class TarefaController {
     private final TarefaService tarefaService;
 
     @PostMapping
-    public ResponseEntity<TarefaResponseDTO> saveTask( @RequestBody TarefaRequestDTO request){
+    public ResponseEntity<TarefaResponseDTO> saveTask(@Valid @RequestBody TarefaRequestDTO request){
         TarefaResponseDTO response = tarefaService.salvarTarefa(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Tarefa> deleteTask(@PathVariable Long id){
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id){
         tarefaService.remover(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TarefaResponseDTO> updateTask( @PathVariable Long id, @RequestBody TarefaRequestDTO request){
+    public ResponseEntity<TarefaResponseDTO> updateTask(@Valid @PathVariable Long id, @RequestBody TarefaRequestDTO request){
         TarefaResponseDTO atualizandoTask = tarefaService.atualizarPorId(id,request);
         return ResponseEntity.ok(atualizandoTask);
     }

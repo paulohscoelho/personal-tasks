@@ -26,7 +26,6 @@ public class Tarefa {
     private Long id;
 
     @Column(nullable = false)
-    @NotBlank
     private String titulo;
 
     @Column(nullable = false)

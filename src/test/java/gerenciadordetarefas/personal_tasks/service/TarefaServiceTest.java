@@ -92,37 +92,7 @@ public class TarefaServiceTest {
 
         }
 
-        @Test
-        void deveLancarExcecao_quandoDataInicioForNulo(){
-            LocalDateTime inicio = LocalDateTime.of(2027, 8, 4, 10, 0);
-            LocalDateTime fim = LocalDateTime.of(2027, 8, 5, 12, 0);
 
-            TarefaRequestDTO request = new TarefaRequestDTO(
-                    "Estudar testes",
-                    "criar testes unitario do service",
-                    Status.PENDENTE,
-                    null,
-                    fim
-            );
-            Tarefa tarefaParaSalvar = new Tarefa(
-                    null,
-                    "Estudar testes",
-                    "criar testes unitario do service",
-                    Status.PENDENTE,
-                    null,
-                    fim
-            );
-
-            when(mapper.paraTarefa(request)).thenReturn(tarefaParaSalvar);
-
-            RegraNegocioException excecao = assertThrows(
-                    RegraNegocioException.class,() ->
-                        service.salvarTarefa(request)
-            );
-
-            assertEquals("data inicio tem que ser preenchida",excecao.getMessage());
-            verify(repository,never()).save(any());
-        }
 
 
         @Test

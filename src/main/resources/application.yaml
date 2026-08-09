@@ -15,7 +15,11 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+# Formato padrão para leitura e escrita de datas em formato de texto no JSON
 
+  jackson:
+    date-format: "yyyy-MM-dd HH:mm:ss"
+    time-zone: "America/Sao_Paulo"
 
 
   main:

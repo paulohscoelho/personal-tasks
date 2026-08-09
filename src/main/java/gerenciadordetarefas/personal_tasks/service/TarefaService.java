@@ -17,21 +17,18 @@ import java.util.List;
 public class TarefaService {
     private final TarefaRepository repository;
     private final TarefaMapper mapper;
-
     public TarefaResponseDTO salvarTarefa(TarefaRequestDTO request){
 
         Tarefa tarefa = mapper.paraTarefa(request);
 
-        if (tarefa.getDataInicio() == null){
-            throw new RegraNegocioException("data inicio tem que ser preenchida");
-        }
 
-        if (tarefa.getDataFim() != null){
-            if (tarefa.getDataFim().isBefore(tarefa.getDataInicio() )|| tarefa.getDataFim().isEqual(tarefa.getDataInicio())) {
+        if (tarefa.getDataFim() != null) {
+            if (tarefa.getDataFim().isBefore(tarefa.getDataInicio()) || tarefa.getDataFim().isEqual(tarefa.getDataInicio())) {
                 throw new RegraNegocioException(
                         "A data de término da tarefa não pode ser igual ou anterior a data do inicio da tarefa");
             }
         }
+
         if (tarefa.getStatus() == Status.CONCLUIDA){
             throw new RegraNegocioException("A tarefa não pode ser criada como Status: 'CONCLUIDA'");
         }

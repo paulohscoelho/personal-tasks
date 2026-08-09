@@ -22,9 +22,7 @@ public class TarefaService {
 
         Tarefa tarefa = mapper.paraTarefa(request);
 
-        if (tarefa.getDataInicio() == null){
-            throw new RegraNegocioException("data inicio tem que ser preenchida");
-        }
+
 
         if (tarefa.getDataFim() != null){
             if (tarefa.getDataFim().isBefore(tarefa.getDataInicio() )|| tarefa.getDataFim().isEqual(tarefa.getDataInicio())) {

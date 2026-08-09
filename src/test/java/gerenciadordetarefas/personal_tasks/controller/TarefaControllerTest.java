@@ -93,14 +93,12 @@ class TarefaControllerTest {
                     "titulo","descricao", Status.PENDENTE,inicio,fim
             );
 
-            BDDMockito.given(service.salvarTarefa(ArgumentMatchers.any(TarefaRequestDTO.class)))
-                    .willThrow(new RegraNegocioException("data inicio tem que ser preenchida"));
+
 
             mock.perform(post("/tasks")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isBadRequest()
-            );
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest());
         }
 
 

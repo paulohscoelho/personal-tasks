@@ -1,6 +1,7 @@
 package gerenciadordetarefas.personal_tasks.controller;
 
 
+import static org.mockito.BDDMockito.willReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -10,6 +11,7 @@ import gerenciadordetarefas.personal_tasks.dto.TarefaRequestDTO;
 import gerenciadordetarefas.personal_tasks.dto.TarefaResponseDTO;
 import gerenciadordetarefas.personal_tasks.exception.RegraNegocioException;
 import gerenciadordetarefas.personal_tasks.model.Status;
+import gerenciadordetarefas.personal_tasks.model.Tarefa;
 import gerenciadordetarefas.personal_tasks.service.TarefaService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -196,4 +198,73 @@ class TarefaControllerTest {
 
     }
 
+    @Nested
+    class updateTasks{
+        @Test
+        void deveRetornarStatus200_quandoAtualizarTarefaComSucesso()throws Exception{
+            LocalDateTime inicio = LocalDateTime.of(2027,8,1,10,0);
+            LocalDateTime fim = LocalDateTime.of(2027,8,10,0,0);
+            Long id = 1L;
+            TarefaRequestDTO request = new TarefaRequestDTO(
+                    "titulo Atualizado","descricao Atualizado",Status.PENDENTE,inicio,fim
+            );
+
+            TarefaResponseDTO response = new TarefaResponseDTO(
+                    id,"titulo Atualizado","descricao Atualizado",Status.PENDENTE,inicio,fim
+
+            );
+
+            BDDMockito.given(service.atualizarPorId(id,request)).willReturn(response);
+
+            mock.perform(put("/tasks/{id}",id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(id))
+                    .andExpect(jsonPath("$.titulo").value("titulo Atualizado"));
+        }
+
+        @Test
+        void deveRetornarStatus400_quandoServiceLancarRegraNegocioExceptionAoAtualizar()throws Exception{
+            LocalDateTime inicio = LocalDateTime.of(2027,8,1,10,0);
+            LocalDateTime fim = LocalDateTime.of(2027,8,10,0,0);
+            Long id = 1L;
+            TarefaRequestDTO request = new TarefaRequestDTO(
+                "titulo Atualizado","descricao Atualizado",Status.PENDENTE,inicio,fim
+
+            );
+
+            BDDMockito.given(service.atualizarPorId(id,request))
+                    .willThrow(new RegraNegocioException("id '1' não encontrado"));
+
+            mock.perform(put("/tasks/{id}",id)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(request)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.mensagem").value("id '1' não encontrado")) ;
+        }
+    }
+
+    @Nested
+    class getTask{
+        @Test
+        void deveRetornar200_quandoIDForEncontrado() throws Exception {
+            LocalDateTime inicio = LocalDateTime.of(2027,8,1,10,0);
+            LocalDateTime fim = LocalDateTime.of(2027,8,10,0,0);
+            Long id = 1L;
+
+            TarefaResponseDTO response = new TarefaResponseDTO(
+                    id,"titulo","descricao",Status.PENDENTE,inicio,fim
+            );
+
+            BDDMockito.given(service.chamarPorId(id)).willReturn(response);
+
+            mock.perform(get("/tasks/{id}",id)
+                    .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(1L))
+                    .andExpect(jsonPath("$.titulo").value("titulo"))
+                    .andExpect(jsonPath("$.descricao").value("descricao"));
+        }
+    }
 }

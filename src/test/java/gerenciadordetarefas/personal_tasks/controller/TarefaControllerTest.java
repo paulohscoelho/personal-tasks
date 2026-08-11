@@ -180,8 +180,18 @@ class TarefaControllerTest {
             mock.perform(get("/tasks").param("status","PENDENTE"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$[0].status").value("PENDENTE"));
+        }
 
+        @Test
+        void deveRetornarStatus400_quandoServiceLancarRegraNegocioException() throws Exception {
+            Status status = Status.PENDENTE;
 
+            BDDMockito.given(service.chamarPorStatus(status))
+                    .willThrow(new RegraNegocioException("Lista de tarefas está vazia"));
+
+            mock.perform(get("/tasks").param("status","PENDENTE"))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.mensagem").value("Lista de tarefas está vazia"));
         }
 
     }

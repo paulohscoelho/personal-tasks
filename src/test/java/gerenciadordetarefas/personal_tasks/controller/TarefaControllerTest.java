@@ -1,17 +1,11 @@
 package gerenciadordetarefas.personal_tasks.controller;
 
 
-import static org.mockito.BDDMockito.willReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gerenciadordetarefas.personal_tasks.dto.TarefaRequestDTO;
 import gerenciadordetarefas.personal_tasks.dto.TarefaResponseDTO;
 import gerenciadordetarefas.personal_tasks.exception.RegraNegocioException;
 import gerenciadordetarefas.personal_tasks.model.Status;
-import gerenciadordetarefas.personal_tasks.model.Tarefa;
 import gerenciadordetarefas.personal_tasks.service.TarefaService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,6 +19,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @WebMvcTest(TarefaController.class)
@@ -67,7 +65,7 @@ class TarefaControllerTest {
         }
 
         @Test
-        void deveRetornarBadRequestQuandoTituloForInvalido() throws Exception {
+        void deveRetornar400QuandoTituloForInvalido() throws Exception {
             LocalDateTime inicio = LocalDateTime.of(2027,8,8,10,0);
             LocalDateTime fim = LocalDateTime.of(2027,8,10,10,0);
 
@@ -78,12 +76,11 @@ class TarefaControllerTest {
             mock.perform(post("/tasks")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isBadRequest()
-                    );
+                    .andExpect(status().isBadRequest());
         }
 
         @Test
-        void deveRetornarBadRequestQuandoDataInicioForNula()throws Exception{
+        void deveRetornar400QuandoDataInicioForNula()throws Exception{
             LocalDateTime inicio = null;
             LocalDateTime fim = LocalDateTime.of(2027,8,10,10,0);
 
@@ -101,7 +98,7 @@ class TarefaControllerTest {
 
 
         @Test
-        void deveRetornarStatusDeErroQuandoServiceLancarExcecao() throws Exception{
+        void deveRetornar400ErroQuandoServiceLancarExcecao() throws Exception{
             LocalDateTime inicio = LocalDateTime.of(2027,8,10,10,0);
             LocalDateTime fim = LocalDateTime.of(2027,8,1,0,0);
             TarefaRequestDTO request = new TarefaRequestDTO(
@@ -116,7 +113,8 @@ class TarefaControllerTest {
             mock.perform(post("/tasks")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.mensagem").value("A data de término da tarefa não pode ser igual ou anterior a data do inicio da tarefa"));
         }
 
     }
@@ -133,14 +131,15 @@ class TarefaControllerTest {
         }
 
         @Test
-        void deveRetonarStatusDeErroQuandoServiceLancarExcecaoAoDeletar() throws Exception{
+        void deveRetonar400QuandoServiceLancarExcecaoAoDeletar() throws Exception{
             Long idInexistente = 99L;
 
             BDDMockito.doThrow(new RegraNegocioException("id '99' não encontrado"))
                     .when(service).remover(idInexistente);
 
             mock.perform(delete("/tasks/{id}",idInexistente))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.mensagem").value("id '99' não encontrado"));;
 
         }
     }
@@ -169,7 +168,7 @@ class TarefaControllerTest {
         }
 
         @Test
-        void deveRetornarListaFiltradaEStatus200_quandoStatusEnviadoNaUrl() throws Exception {
+        void deveRetornarListaFiltradaE200_quandoStatusEnviadoNaUrl() throws Exception {
             LocalDateTime inicio = LocalDateTime.of(2027,8,1,10,0);
             LocalDateTime fim = LocalDateTime.of(2027,8,10,0,0);
 
@@ -185,7 +184,7 @@ class TarefaControllerTest {
         }
 
         @Test
-        void deveRetornarStatus400_quandoServiceLancarRegraNegocioException() throws Exception {
+        void deveRetornar400_quandoServiceLancarRegraNegocioException() throws Exception {
             Status status = Status.PENDENTE;
 
             BDDMockito.given(service.chamarPorStatus(status))
@@ -201,7 +200,7 @@ class TarefaControllerTest {
     @Nested
     class updateTasks{
         @Test
-        void deveRetornarStatus200_quandoAtualizarTarefaComSucesso()throws Exception{
+        void deveRetornar200_quandoAtualizarTarefaComSucesso()throws Exception{
             LocalDateTime inicio = LocalDateTime.of(2027,8,1,10,0);
             LocalDateTime fim = LocalDateTime.of(2027,8,10,0,0);
             Long id = 1L;
@@ -225,7 +224,7 @@ class TarefaControllerTest {
         }
 
         @Test
-        void deveRetornarStatus400_quandoServiceLancarRegraNegocioExceptionAoAtualizar()throws Exception{
+        void deveRetornar400_quandoServiceLancarRegraNegocioExceptionAoAtualizar()throws Exception{
             LocalDateTime inicio = LocalDateTime.of(2027,8,1,10,0);
             LocalDateTime fim = LocalDateTime.of(2027,8,10,0,0);
             Long id = 1L;
@@ -259,12 +258,24 @@ class TarefaControllerTest {
 
             BDDMockito.given(service.chamarPorId(id)).willReturn(response);
 
-            mock.perform(get("/tasks/{id}",id)
-                    .contentType(MediaType.APPLICATION_JSON))
+            mock.perform(get("/tasks/{id}",id))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(1L))
                     .andExpect(jsonPath("$.titulo").value("titulo"))
                     .andExpect(jsonPath("$.descricao").value("descricao"));
+        }
+
+        @Test
+        void deveRetornar400_quandoIDNaoForEncontrado() throws Exception{
+            Long idInexistente = 99L;
+
+
+            BDDMockito.given(service.chamarPorId(idInexistente)).willThrow(new RegraNegocioException("id não encontrado"));
+
+            mock.perform(get("/tasks/{id}",idInexistente))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.mensagem").value("id não encontrado"));
+
         }
     }
 }

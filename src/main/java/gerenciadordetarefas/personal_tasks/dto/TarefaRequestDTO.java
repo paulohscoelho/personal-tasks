@@ -7,9 +7,11 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
 public record TarefaRequestDTO(
+     @Size(min = 1, max = 100)
      @NotBlank(message = "título é obrigatório")
      String titulo,
 
+     @Size(min = 1, max = 250)
      @NotBlank(message = "descrição é obrigatória")
      String descricao,
 

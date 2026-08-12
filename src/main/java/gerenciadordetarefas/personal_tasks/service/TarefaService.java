@@ -17,32 +17,23 @@ import java.util.List;
 public class TarefaService {
     private final TarefaRepository repository;
     private final TarefaMapper mapper;
+
     public TarefaResponseDTO salvarTarefa(TarefaRequestDTO request){
 
         Tarefa tarefa = mapper.paraTarefa(request);
 
-
-        if (tarefa.getDataFim() != null) {
-            if (tarefa.getDataFim().isBefore(tarefa.getDataInicio()) || tarefa.getDataFim().isEqual(tarefa.getDataInicio())) {
+        if (tarefa.getDataFim() != null){
+            if (tarefa.getDataFim().isBefore(tarefa.getDataInicio() )|| tarefa.getDataFim().isEqual(tarefa.getDataInicio())) {
                 throw new RegraNegocioException(
                         "A data de término da tarefa não pode ser igual ou anterior a data do inicio da tarefa");
             }
         }
-
         if (tarefa.getStatus() == Status.CONCLUIDA){
             throw new RegraNegocioException("A tarefa não pode ser criada como Status: 'CONCLUIDA'");
         }
 
         Tarefa tarefaSalva = repository.save(tarefa);
         return mapper.paraResponseDTO(tarefaSalva);
-    }
-
-    public List<TarefaResponseDTO>  chamarTodos(){
-        List<Tarefa> lista = repository.findAll();
-        if (lista.isEmpty()){
-            throw new RegraNegocioException("Lista de tarefas está vazia");
-        }
-        return mapper.paraResponseDTOList(lista);
     }
 
     public void remover(Long id){
@@ -106,5 +97,12 @@ public class TarefaService {
         return tarefas.stream().map(mapper::paraResponseDTO).toList();
     }
 
+    public List<TarefaResponseDTO>  chamarTodos(){
+        List<Tarefa> lista = repository.findAll();
+        if (lista.isEmpty()){
+            throw new RegraNegocioException("Lista de tarefas está vazia");
+        }
+        return mapper.paraResponseDTOList(lista);
+    }
 
 }

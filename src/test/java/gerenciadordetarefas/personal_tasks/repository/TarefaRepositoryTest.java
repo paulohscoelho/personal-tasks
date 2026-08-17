@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @DataJpaTest
 class TarefaRepositoryTest {
@@ -56,4 +57,84 @@ class TarefaRepositoryTest {
 
     }
 
+    @Test
+    void deveRetornarListaVazia_quandoBuscarPorStatusInexistente(){
+        var tarefaPendente = new Tarefa();
+        tarefaPendente.setTitulo("Estudar JPA");
+        tarefaPendente.setDescricao("Testando");
+        tarefaPendente.setStatus(Status.PENDENTE);
+        tarefaPendente.setDataInicio(LocalDateTime.now());
+        tarefaPendente.setDataFim(LocalDateTime.now().plusDays(1));
+
+        manager.persist(tarefaPendente);
+
+        var resultado = this.repository.findByStatus(Status.CONCLUIDA);
+        Assertions.assertNotNull(resultado);
+        Assertions.assertTrue(resultado.isEmpty());
+
+    }
+
+
+    @Test
+    void findByDataInicioBetween_quandoExistemTarefasNoPeriodo_deveRetornarApenasAsTarefasDoIntervalo(){
+        var tarefa1 = new Tarefa();
+
+        var hoje = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
+
+        tarefa1.setTitulo("Estudar JPA");
+        tarefa1.setDescricao("testando");
+        tarefa1.setStatus(Status.PENDENTE);
+        tarefa1.setDataInicio(hoje.minusDays(1));
+        tarefa1.setDataFim(hoje.plusDays(2));
+
+        manager.persist(tarefa1);
+
+        var tarefa2 = new Tarefa();
+
+        tarefa2.setTitulo("Organizar github");
+        tarefa2.setDescricao("verificar commits");
+        tarefa2.setStatus(Status.PENDENTE);
+        tarefa2.setDataInicio(hoje.minusDays(5));
+        tarefa2.setDataFim(hoje.plusDays(7));
+
+        manager.persist(tarefa2);
+
+        var tarefa3 = new Tarefa();
+
+        tarefa3.setTitulo("Ler um livro");
+        tarefa3.setDescricao("Livro de Algoritmo");
+        tarefa3.setStatus(Status.PENDENTE);
+        tarefa3.setDataInicio(hoje.minusDays(2));
+        tarefa3.setDataFim(hoje.plusDays(3));
+
+        manager.persist(tarefa3);
+
+        var inicioFiltro = hoje.minusDays(1);
+        var fimFiltro = hoje.plusDays(2);
+
+        var resultado = this.repository.findByDataInicioBetween(inicioFiltro,fimFiltro);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(1,resultado.size());
+        Assertions.assertEquals("Estudar JPA",resultado.get(0).getTitulo());
+
+
+    }
+
+    @Test
+    void deveLancarExcecao_quandoTentarSalvarTituloNulo(){
+        var TarefaSemTitulo = new Tarefa();
+
+        var hoje = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
+
+        TarefaSemTitulo.setDescricao("testando");
+        TarefaSemTitulo.setStatus(Status.PENDENTE);
+        TarefaSemTitulo.setDataInicio(hoje.minusDays(1));
+        TarefaSemTitulo.setDataFim(hoje.plusDays(2));
+
+
+        Assertions.assertThrows(Exception.class,()->{
+            manager.persistAndFlush(TarefaSemTitulo);
+        });
+    }
 }

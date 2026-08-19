@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -137,4 +138,74 @@ class TarefaRepositoryTest {
             manager.persistAndFlush(TarefaSemTitulo);
         });
     }
+
+    @Test
+    void buscarPorDescricao_quandoTermoExiste_deveRetornarTarefasCorrespondentes(){
+
+        var tarefa1 = new Tarefa();
+        tarefa1.setTitulo("Estudar Spring");
+        tarefa1.setDescricao("Aprender consultas em JPQL com Spring data");
+        tarefa1.setStatus(Status.PENDENTE);
+        tarefa1.setDataInicio(LocalDateTime.now());
+        tarefa1.setDataFim(LocalDateTime.now().plusDays(1));
+        manager.persist(tarefa1);
+
+        var tarefa2 = new Tarefa();
+        tarefa2.setTitulo("Exercicios");
+        tarefa2.setDescricao("Pratiacr logica de programação");
+        tarefa2.setStatus(Status.PENDENTE);
+        tarefa2.setDataInicio(LocalDateTime.now());
+        tarefa2.setDataFim(LocalDateTime.now().plusDays(1));
+        manager.persist(tarefa2);
+
+
+        var resultado = this.repository.buscarPorDescricao("JPQL");
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(1,resultado.size());
+        Assertions.assertEquals("Estudar Spring",resultado.get(0).getTitulo());
+
+
+    }
+
+    @Test
+    void buscarPorStatusETitulo_quandoTermoExiste_deveRetornarTarefasCorrespondentes(){
+        var tarefa1 = new Tarefa();
+        tarefa1.setTitulo("Estudar Spring");
+        tarefa1.setDescricao("hoje a tarde");
+        tarefa1.setStatus(Status.PENDENTE);
+        tarefa1.setDataInicio(LocalDateTime.now());
+        tarefa1.setDataFim(LocalDateTime.now().plusDays(1));
+        manager.persist(tarefa1);
+
+        var tarefa2 = new Tarefa();
+        tarefa2.setTitulo("Estudar Spring");
+        tarefa2.setDescricao("hoje de manha");
+        tarefa2.setStatus(Status.CONCLUIDA);
+        tarefa2.setDataInicio(LocalDateTime.now());
+        tarefa2.setDataFim(LocalDateTime.now().plusDays(3));
+        manager.persist(tarefa2);
+
+        var tarefa3 = new Tarefa();
+        tarefa3.setTitulo("Estudar ANGULAR");
+        tarefa3.setDescricao("Estudar amanha de manhã");
+        tarefa3.setStatus(Status.CONCLUIDA);
+        tarefa3.setDataInicio(LocalDateTime.now());
+        tarefa3.setDataFim(LocalDateTime.now().plusDays(2));
+        manager.persist(tarefa3);
+
+        var resultado = this.repository.buscarPorStatusETitulo(Status.PENDENTE,"Spring");
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(1,resultado.size());
+        Assertions.assertEquals("Estudar Spring", resultado.get(0).getTitulo());
+    }
+
+
+
+
+
+
+
+
 }

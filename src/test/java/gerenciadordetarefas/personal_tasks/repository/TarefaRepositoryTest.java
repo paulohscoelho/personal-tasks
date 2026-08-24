@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -118,8 +117,6 @@ class TarefaRepositoryTest {
         Assertions.assertNotNull(resultado);
         Assertions.assertEquals(1,resultado.size());
         Assertions.assertEquals("Estudar JPA",resultado.get(0).getTitulo());
-
-
     }
 
     @Test
@@ -133,14 +130,13 @@ class TarefaRepositoryTest {
         TarefaSemTitulo.setDataInicio(hoje.minusDays(1));
         TarefaSemTitulo.setDataFim(hoje.plusDays(2));
 
-
         Assertions.assertThrows(Exception.class,()->{
             manager.persistAndFlush(TarefaSemTitulo);
         });
     }
 
     @Test
-    void buscarPorDescricao_quandoTermoExiste_deveRetornarTarefasCorrespondentes(){
+    void buscarPorDescricao_quandoTermoExistir_deveRetornarTarefasCorrespondentes(){
 
         var tarefa1 = new Tarefa();
         tarefa1.setTitulo("Estudar Spring");
@@ -152,7 +148,7 @@ class TarefaRepositoryTest {
 
         var tarefa2 = new Tarefa();
         tarefa2.setTitulo("Exercicios");
-        tarefa2.setDescricao("Pratiacr logica de programação");
+        tarefa2.setDescricao("Praticar logica de programação");
         tarefa2.setStatus(Status.PENDENTE);
         tarefa2.setDataInicio(LocalDateTime.now());
         tarefa2.setDataFim(LocalDateTime.now().plusDays(1));
@@ -169,7 +165,7 @@ class TarefaRepositoryTest {
     }
 
     @Test
-    void buscarPorStatusETitulo_quandoTermoExiste_deveRetornarTarefasCorrespondentes(){
+    void buscarPorStatusETitulo_quandoTermoExistir_deveRetornarTarefasCorrespondentes(){
         var tarefa1 = new Tarefa();
         tarefa1.setTitulo("Estudar Spring");
         tarefa1.setDescricao("hoje a tarde");
@@ -201,7 +197,68 @@ class TarefaRepositoryTest {
         Assertions.assertEquals("Estudar Spring", resultado.get(0).getTitulo());
     }
 
+    @Test
+    void buscarPorStatusOrdenadoPorDataInicioDesc_deveRetornarTarefasOrdenacaoCorreta(){
+        var hoje = LocalDateTime.now();
 
+        var tarefaAntiga = new Tarefa();
+        tarefaAntiga.setTitulo("Titulo Antigo");
+        tarefaAntiga.setDescricao("Titulo criado ontem");
+        tarefaAntiga.setStatus(Status.PENDENTE);
+        tarefaAntiga.setDataInicio(hoje.minusDays(1));
+        tarefaAntiga.setDataFim(hoje.plusDays(1));
+        manager.persist(tarefaAntiga);
+
+        var tarefaRecente = new Tarefa();
+        tarefaRecente.setTitulo("Titulo Recente");
+        tarefaRecente.setDescricao("Titulo criado Hoje");
+        tarefaRecente.setStatus(Status.PENDENTE);
+        tarefaRecente.setDataInicio(hoje);
+        tarefaRecente.setDataFim(hoje.plusDays(1));
+        manager.persist(tarefaRecente);
+
+        var resultado = this.repository.buscarPorStatusOrdenadoPorDataInicioDesc(Status.PENDENTE);
+
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(2,resultado.size());
+        Assertions.assertEquals("Titulo Recente",resultado.get(0).getTitulo());
+        Assertions.assertEquals("Titulo Antigo",resultado.get(1).getTitulo());
+
+    }
+
+    @Test
+    void buscarQuantidadeDeTarefasComDeterminadoStatus_deveRetornarQauntidadeDeTarefasDoMesmoStatus(){
+        var hoje = LocalDateTime.now();
+
+        var tarefa1 = new Tarefa();
+        tarefa1.setTitulo("tarefa Criar testes unitarios");
+        tarefa1.setDescricao("Testes unitarios de manha");
+        tarefa1.setStatus(Status.PENDENTE);
+        tarefa1.setDataInicio(hoje.minusDays(1));
+        tarefa1.setDataFim(hoje.plusDays(1));
+        manager.persist(tarefa1);
+
+        var tarefa2 = new Tarefa();
+        tarefa2.setTitulo("Atualizar DTO ");
+        tarefa2.setDescricao("Atualizar dto");
+        tarefa2.setStatus(Status.CONCLUIDA);
+        tarefa2.setDataInicio(hoje.minusDays(2));
+        tarefa2.setDataFim(hoje.plusDays(2));
+        manager.persist(tarefa2);
+
+        var tarefa3 = new Tarefa();
+        tarefa3.setTitulo("Excluir testes antigos");
+        tarefa3.setDescricao("excluir testes que ja estao concluidos");
+        tarefa3.setStatus(Status.PENDENTE);
+        tarefa3.setDataInicio(hoje.minusDays(3));
+        tarefa3.setDataFim(hoje.plusDays(3));
+        manager.persist(tarefa3);
+
+        var resultado = this.repository.buscarQuantidadeDeTarefasComDeterminadoStatus(Status.PENDENTE);
+        Assertions.assertNotNull(resultado);
+        Assertions.assertEquals(2L, resultado);
+
+    }
 
 
 

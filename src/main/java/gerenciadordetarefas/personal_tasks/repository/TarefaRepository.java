@@ -22,7 +22,11 @@ public interface TarefaRepository extends JpaRepository<Tarefa, Long> {
     @Query("SELECT t FROM Tarefa t WHERE t.status = :status AND t.titulo LIKE CONCAT('%', :termo, '%')")
     List<Tarefa> buscarPorStatusETitulo(@Param("status") Status status, @Param("termo") String termo);
 
+    @Query("SELECT t FROM Tarefa t WHERE t.status = :status ORDER BY t.dataInicio DESC")
+    List<Tarefa> buscarPorStatusOrdenadoPorDataInicioDesc(@Param("status") Status status);
 
+    @Query("SELECT COUNT(t) FROM Tarefa t WHERE t.status = :status")
+    Long buscarQuantidadeDeTarefasComDeterminadoStatus(@Param("status") Status status);
 
 
 }

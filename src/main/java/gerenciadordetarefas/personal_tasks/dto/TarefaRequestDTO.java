@@ -19,12 +19,12 @@ public record TarefaRequestDTO(
      Status status,
 
      @NotNull(message = "data início é obrigatória")
-     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
      LocalDateTime dataInicio,
 
 
      @NotNull(message = "data fim é obrigatória")
-     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
      LocalDateTime dataFim
 ) {
 
